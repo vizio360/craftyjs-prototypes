@@ -1,0 +1,66 @@
+SPEED = 5
+STEP = 100
+stageWidth = Crafty.stage.elem.offsetWidth
+stageHeight = Crafty.stage.elem.offsetHeight
+
+
+Crafty.e("2D, Canvas, Player, Color, Twoway")
+    .attr(
+        x: 100
+        y: 100
+        w: 5
+        h: 100
+        direction: 1
+    )
+    .color("red")
+    .twoway(10, 0)
+    .requires("Keyboard").bind('KeyDown', ->
+        if @isDown('SPACE')
+            @direction *= -1
+            color = if @direction is 1 then "red" else "blue"
+            @color(color)
+    )
+
+setInterval ->
+    Crafty.e("Cube, 2D, DOM, Color, Collision, WiredHitBox")
+        .attr(
+            x: 0
+            y: 10+Math.random()*(stageHeight-10)
+            w: 10
+            h: 10
+            hitted: false
+            velocity: new Crafty.math.Vector2D SPEED, 0
+        )
+        .bind "EnterFrame", ->
+            cubes = @hit("Static")
+            if cubes
+                c = cubes[0].obj
+                if @velocity.x > 0
+                    @x = c.x - @_w
+                if @velocity.y > 0
+                    @y = c.y - @_h
+                if @velocity.y < 0
+                    @y = c.y + @_h
+                @addComponent "Static"
+                @unbind "EnterFrame"
+            @x += @velocity.x
+            @y += @velocity.y
+            if @x > stageWidth
+                @destroy()
+            if @y < 0
+                @y = 0
+                @addComponent "Static"
+                @unbind "EnterFrame"
+            if @y > stageHeight
+                @y = stageHeight - @_h
+                @addComponent "Static"
+                @unbind "EnterFrame"
+            
+        .onHit "Player", ->
+            return if @hitted
+            @hitted = true
+            player = Crafty("Player")
+            @velocity.x = 0
+            @velocity.y = SPEED * player.direction
+        .color("green")
+, 300

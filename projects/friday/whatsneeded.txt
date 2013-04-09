@@ -1,0 +1,6 @@
+
+
+Cakefile with build task to concatenate and compile all coffeescript
+files in src and put them in lib/game.js
+
+testacular.conf.js to run tests

@@ -1,0 +1,68 @@
+stageWidth = Crafty.stage.elem.offsetWidth
+stageHeight = Crafty.stage.elem.offsetHeight
+
+
+#Crafty.sprite(1, "http://recruitment.qbis.lt/new/uploads/public/agencies/vacancies/e8b393b9716e01aff61a8f99d29e399a.jpg", avatar: [0, 0])
+Crafty.e("ground, 2D, DOM, Color, Collision")
+    .attr(
+        x: 0
+        y: stageHeight-11
+        w: stageWidth
+        h: 100
+    )
+    .color("blue")
+Crafty.e("floor, 2D, DOM, Color, Collision")
+    .attr(
+        x: 0
+        y: stageHeight-10
+        w: stageWidth
+        h: 100
+    )
+    .color("blue")
+Crafty.e("2D, DOM, Player, Color, Collision, Twoway, Gravity")
+    .attr(
+        x: 100
+        y: 100
+        w: 150
+        h: 150
+        #velocity: new Crafty.math.Vector2D(0, 0)
+    )
+    .bind "EnterFrame", ->
+        if @_x < 0
+            @x = 0
+        if @_x + @_w > stageWidth
+            @x = stageWidth - @_w
+    .color("blue")
+    .twoway(20, 10)
+    .gravity("floor")
+    .gravityConst(0.98)
+    #.image("http://recruitment.qbis.lt/new/uploads/public/agencies/vacancies/e8b393b9716e01aff61a8f99d29e399a.jpg")
+    #.collision(new Crafty.circle(75, 75, 75))
+
+setInterval ->
+    Crafty.e("2D, DOM, Color, Collision, Gravity")
+        .attr(
+            x: Math.random()*(stageWidth-10) + 10
+            y: Math.random()*100
+            w: 10
+            h: 10
+            escape: false
+        )
+        .bind "EnterFrame", ->
+            return unless @escape
+            dir = 1
+            dir *= -1 if @x < stageWidth/2
+
+            @x += 20*dir
+
+            if @_x < 0 or @_x > stageWidth
+                @destroy()
+
+        .gravity("floor")
+        .gravityConst(0.98)
+        .color("red")
+        .onHit "ground", ->
+            @antigravity()
+            @escape = true
+
+, 2000
